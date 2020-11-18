@@ -1,0 +1,7 @@
+version: "3.7"
+
+services:
+  node:
+    image: test_refaat
+    ports:
+      - 5000:5000
