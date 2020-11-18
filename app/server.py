@@ -8,6 +8,7 @@ from starlette.applications import Starlette
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
+export_file_url = 'https://www.dropbox.com/s/jxkgkn4juawb8o2/export.pkl?raw=1'
 export_file_name = 'export.pkl'
 
 classes = ['Mild', 'Moderate', 'No_DR', 'Proliferate_DR', 'Severe']
@@ -18,7 +19,18 @@ app.add_middleware(CORSMiddleware, allow_origins=[
                    '*'], allow_headers=['Content-Type'])
 
 
+async def download_file(url, dest):
+    if dest.exists():
+        return
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            data = await response.read()
+            with open(dest, 'wb') as f:
+                f.write(data)
+
+
 async def setup_learner():
+    await download_file(export_file_url, path / export_file_name)
     try:
         learn = load_learner(path, export_file_name)
         return learn
